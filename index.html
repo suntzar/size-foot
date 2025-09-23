@@ -131,7 +131,7 @@
     <div class="container">
         <header>
             <h1>Gerador de Links do WhatsApp</h1>
-            <p>Carregue o arquivo JSON, selecione os alunos e gere a lista de contatos para solicitar a pontuação dos calçados.</p>
+            <p>Carregue o arquivo, selecione os alunos e gere a lista. Suas seleções são salvas automaticamente.</p>
         </header>
 
         <div class="controls">
@@ -159,6 +159,7 @@
 
     <script>
         let allStudents = [];
+        const STORAGE_KEY = 'studentSelectionState';
 
         document.addEventListener('DOMContentLoaded', () => {
             const fileInput = document.getElementById('jsonFileInput');
@@ -183,7 +184,6 @@
                 reader.onload = (e) => {
                     try {
                         const students = JSON.parse(e.target.result);
-                        // Filtra apenas alunos ativos para a seleção
                         allStudents = students.filter(s => 
                             s.status !== 'Inativo' && s.status !== 'Transferido'
                         );
@@ -210,7 +210,8 @@
                 const grouped = allStudents.reduce((acc, student, index) => {
                     const key = `${student.turma || 'Sem Turma'} - ${student.turno || 'Sem Turno'}`;
                     if (!acc[key]) acc[key] = [];
-                    acc[key].push({ ...student, originalIndex: index });
+                    // Usamos o nome do aluno como identificador único para salvar o estado
+                    acc[key].push({ ...student, uniqueId: student.nome });
                     return acc;
                 }, {});
 
@@ -219,7 +220,6 @@
                 sortedGroupKeys.forEach(groupKey => {
                     const groupDiv = document.createElement('div');
                     groupDiv.className = 'turma-group';
-                    
                     const title = document.createElement('h3');
                     title.className = 'turma-title';
                     title.textContent = groupKey;
@@ -230,15 +230,15 @@
                         .forEach(student => {
                             const itemDiv = document.createElement('div');
                             itemDiv.className = 'student-item';
-                            
                             const checkbox = document.createElement('input');
                             checkbox.type = 'checkbox';
                             checkbox.className = 'student-checkbox';
-                            checkbox.id = `student-${student.originalIndex}`;
-                            checkbox.value = student.originalIndex;
+                            checkbox.id = `student-${student.uniqueId}`;
+                            checkbox.value = student.uniqueId;
+                            checkbox.addEventListener('change', saveSelectionState); // Salva ao alterar
 
                             const label = document.createElement('label');
-                            label.htmlFor = `student-${student.originalIndex}`;
+                            label.htmlFor = `student-${student.uniqueId}`;
                             label.textContent = student.nome;
                             
                             itemDiv.appendChild(checkbox);
@@ -247,15 +247,43 @@
                         });
                     selectionArea.appendChild(groupDiv);
                 });
+                
+                // Após criar a lista, carrega o estado salvo
+                loadSelectionState();
+            }
+
+            // --- FUNÇÃO PARA SALVAR O ESTADO ---
+            function saveSelectionState() {
+                const checkedCheckboxes = document.querySelectorAll('.student-checkbox:checked');
+                const selectedIds = Array.from(checkedCheckboxes).map(cb => cb.value);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(selectedIds));
+            }
+
+            // --- FUNÇÃO PARA CARREGAR O ESTADO ---
+            function loadSelectionState() {
+                const savedState = localStorage.getItem(STORAGE_KEY);
+                if (!savedState) return;
+
+                const selectedIds = JSON.parse(savedState);
+                const selectedSet = new Set(selectedIds);
+
+                const allCheckboxes = document.querySelectorAll('.student-checkbox');
+                allCheckboxes.forEach(checkbox => {
+                    if (selectedSet.has(checkbox.value)) {
+                        checkbox.checked = true;
+                    }
+                });
             }
             
             function cleanPhoneNumber(phone) {
-                const digits = phone.replace(/\D/g, '');
-                // Assume que números com 10 ou 11 dígitos já têm DDD.
+                const defaultDDD = '98'; 
+                let digits = phone.replace(/\D/g, '');
+                if (digits.length === 9) {
+                    digits = defaultDDD + digits;
+                }
                 if (digits.length >= 10 && digits.length <= 11) {
                     return '55' + digits;
                 }
-                // Adicione outras regras se necessário, mas esta é a mais comum.
                 return null;
             }
 
@@ -270,15 +298,16 @@
                 const messageTemplate = "Boa tarde!\n\nSou o ADM Luis Fernando, da Escola Ana Maria Cordeiro de Sousa.\nA pedido da SEMED, estamos realizando a coleta da pontuação do calçado das crianças.\n\nSolicitamos, por gentileza, a pontuação do calçado de XXXXXX.\n\nDesde já, agradecemos a colaboração.";
 
                 selectedCheckboxes.forEach(checkbox => {
-                    const studentIndex = parseInt(checkbox.value, 10);
-                    const student = allStudents[studentIndex];
+                    const studentId = checkbox.value;
+                    const student = allStudents.find(s => s.nome === studentId);
                     
+                    if (!student) return;
+
                     const contacts = [];
                     if (student.telefone && Array.isArray(student.telefone)) {
                         student.telefone.forEach(phone => {
                             const cleanPhone = cleanPhoneNumber(phone);
                             if (cleanPhone) {
-                                const studentNameEncoded = encodeURIComponent(student.nome);
                                 const message = messageTemplate.replace('XXXXXX', student.nome);
                                 const messageEncoded = encodeURIComponent(message);
                                 const link = `https://wa.me/${cleanPhone}?text=${messageEncoded}`;
@@ -310,6 +339,7 @@
                 checkboxes.forEach(checkbox => {
                     checkbox.checked = selectAllCheckbox.checked;
                 });
+                saveSelectionState(); // Salva o estado após a alteração em massa
             }
         });
     </script>
