@@ -186,6 +186,7 @@
                 const SELECTION_STORAGE_KEY = 'studentSelectionState';
                 const MESSAGE_TEMPLATE_KEY = 'whatsappMessageTemplate';
 
+                const htmlElement = document.getElementById;
                 const fileInput = document.getElementById('jsonFileInput');
                 const generateButton = document.getElementById('generate-button');
                 const selectionArea = document.getElementById('student-selection-area');
@@ -410,6 +411,9 @@
                     });
                     saveSelectionState();
                 }
+
+                htmlElement.setAttribute("data-noxss-theme-gen", "dark");
+                htmlElement.setAttribute("data-noxss-palette-gen", "#4d97eb");
             });
         </script>
     </body>
