@@ -23,6 +23,14 @@
         display: flex;
         justify-content: space-between;
       }
+      #theme-button {
+        transition: 0.5s;
+      }
+      #theme-button:hover {
+        cursor: pointer;
+        transform: rotate(90deg);
+        color: var(--noxss-accent-primary);
+      }
       .content-panel {
         max-width: 800px;
         margin: 0 auto;
@@ -76,7 +84,7 @@
       <!-- 1. BARRA DE NAVEGAÇÃO SUPERIOR -->
       <nav class="noxss-navbar">
         <a class="noxss-navbar__brand" href="#"><i data-feather="users" class="noxss-icon"></i> <span>Gerador de Contatos</span></a>
-        <i data-feather="sun" id="theme-button" class="noxss-icon"></i>
+        <i data-feather="sun" id="theme-button" class="noxss-icon" onclick="toggleTheme()"></i>
       </nav>
 
       <!-- 2. CONTEÚDO PRINCIPAL COM ABAS -->
@@ -455,6 +463,24 @@
           });
           saveSelectionState();
         }
+
+        function toggleTheme() {
+          const buttonTheme = document.getElementById("theme-button");
+
+          if (htmlElement.getAttribute("data-noxss-theme-gen") === "light") {
+            htmlElement.setAttribute("data-noxss-theme-gen", "dark");
+            htmlElement.setAttribute("data-noxss-palette-gen", "#e0c670");
+            buttonTheme.setAttribute("data-feather", "sun");
+            feather.replace();
+          } else {
+            htmlElement.setAttribute("data-noxss-theme-gen", "light");
+            htmlElement.setAttribute("data-noxss-palette-gen", "#d9ae1e");
+            buttonTheme.setAttribute("data-feather", "moon");
+            feather.replace();
+          }
+        }
+
+        window.toggleTheme = toggleTheme;
 
         htmlElement.setAttribute("data-noxss-theme-gen", "dark");
         htmlElement.setAttribute("data-noxss-palette-gen", "#e0c670");
