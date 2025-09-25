@@ -1,425 +1,464 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-br">
-    <!-- Começa com o tema dark padrão da Noxss -->
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Noxss - Gerador de Contatos Dinâmico</title>
+  <!-- Começa com o tema dark padrão da Noxss -->
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Noxss - Gerador de Contatos Dinâmico</title>
 
+    <!-- FAVICON - SVG EM BASE64 -->
+    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGM2NzAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0iZmVhdGhlciBmZWF0aGVyLXVzZXJzIG5veHNzLWljb24iPjxwYXRoIGQ9Ik0xNyAyMXYtMmE0IDQgMCAwIDAtNC00SDVhNCA0IDAgMCAwLTQgNHYyIj48L3BhdGg+PGNpcmNsZSBjeD0iOSIgY3k9IjciIHI9IjQiPjwvY2lyY2xlPjxwYXRoIGQ9Ik0yMyAyMXYtMmE0IDQgMCAwIDAtMy0zLjg3Ij48L3BhdGg+PHBhdGggZD0iTTE2IDMuMTNhNCA0IDAgMCAxIDAgNy43NSI+PC9wYXRoPjwvc3ZnPg==" />
 
-        
-        <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGM2NzAiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiBjbGFzcz0iZmVhdGhlciBmZWF0aGVyLXVzZXJzIG5veHNzLWljb24iPjxwYXRoIGQ9Ik0xNyAyMXYtMmE0IDQgMCAwIDAtNC00SDVhNCA0IDAgMCAwLTQgNHYyIj48L3BhdGg+PGNpcmNsZSBjeD0iOSIgY3k9IjciIHI9IjQiPjwvY2lyY2xlPjxwYXRoIGQ9Ik0yMyAyMXYtMmE0IDQgMCAwIDAtMy0zLjg3Ij48L3BhdGg+PHBhdGggZD0iTTE2IDMuMTNhNCA0IDAgMCAxIDAgNy43NSI+PC9wYXRoPjwvc3ZnPg==" />        
+    <!-- DEPENDÊNCIAS (VIA CDN) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <!-- Apenas para display responsivo (d-none) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/suntzar/noxss-base@main/noxss/dist/noxss.css" />
+    <script defer src="https://unpkg.com/feather-icons"></script>
+    <!-- Nova biblioteca de Markdown -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-        
-        <!-- DEPENDÊNCIAS (VIA CDN) -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" /> <!-- Apenas para display responsivo (d-none) -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/suntzar/noxss-base@main/noxss/dist/noxss.css" />
-        <script defer src="https://unpkg.com/feather-icons"></script>
-        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> <!-- Nova biblioteca de Markdown -->
+    <!-- ESTILOS DO TEMPLATE -->
+    <style>
+      .noxss-navbar {
+        display: flex;
+        justify-content: space-between;
+      }
+      .content-panel {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem;
+      }
+      .turma-group {
+        margin-bottom: 2rem;
+      }
+      .turma-title {
+        font-size: 1.1em;
+        font-weight: 600;
+        color: var(--noxss-accent-primary);
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--noxss-border-color);
+        margin-bottom: 1rem;
+      }
+      #placeholder {
+        text-align: center;
+        padding: 40px;
+        color: var(--noxss-text-secondary);
+        border: 2px dashed var(--noxss-border-color);
+        border-radius: var(--noxss-border-radius-base);
+      }
+      .noxss-check > .noxss-check-control + span {
+        margin-left: 0.5rem;
+      }
+      #available-placeholders code {
+        cursor: pointer;
+        user-select: all;
+      }
+      /* --- Estilos para a área de preview do Markdown --- */
+      #markdown-preview-content ul {
+        list-style: none;
+        padding-left: 0;
+      }
+      #markdown-preview-content li {
+        background-color: var(--noxss-bg-elements);
+        padding: 0.75rem 1rem;
+        border-radius: var(--noxss-border-radius-base);
+        margin-bottom: 0.5rem;
+        border: 1px solid var(--noxss-border-color);
+        word-wrap: break-word; /* Garante que os links não quebrem o layout */
+      }
+      #markdown-preview-content a {
+        margin-left: 0.5rem;
+      }
+    </style>
+  </head>
+  <body data-noxss-layout="app">
+    <div class="noxss-layout">
+      <!-- 1. BARRA DE NAVEGAÇÃO SUPERIOR -->
+      <nav class="noxss-navbar">
+        <a class="noxss-navbar__brand" href="#"><i data-feather="users" class="noxss-icon"></i> <span>Gerador de Contatos</span></a>
+        <i data-feather="sun" id="theme-button" class="noxss-icon"></i>
+      </nav>
 
+      <!-- 2. CONTEÚDO PRINCIPAL COM ABAS -->
+      <main class="noxss-layout__content">
+        <div class="noxss-tabs" data-default-tab="generator">
+          <!-- Abas para Desktop -->
+          <div class="noxss-tabs__header d-none d-md-flex">
+            <button class="noxss-tabs__header-button" data-tab-id="generator"><i class="noxss-icon" data-feather="edit"></i> Gerador</button>
+            <button class="noxss-tabs__header-button" data-tab-id="customization">
+              <i class="noxss-icon" data-feather="message-square"></i>
+              Personalizar
+            </button>
+            <button class="noxss-tabs__header-button" data-tab-id="preview"><i class="noxss-icon" data-feather="eye"></i> Preview</button>
+            <button class="noxss-tabs__header-button" data-tab-id="about"><i class="noxss-icon" data-feather="info"></i> Sobre</button>
+          </div>
 
-        <!-- ESTILOS DO TEMPLATE -->
-        <style>
-            .content-panel {
-                max-width: 800px;
-                margin: 0 auto;
-                padding: 2rem 1.5rem;
-            }
-            .turma-group {
-                margin-bottom: 2rem;
-            }
-            .turma-title {
-                font-size: 1.1em;
-                font-weight: 600;
-                color: var(--noxss-accent-primary);
-                padding-bottom: 0.5rem;
-                border-bottom: 2px solid var(--noxss-border-color);
-                margin-bottom: 1rem;
-            }
-            #placeholder {
-                text-align: center;
-                padding: 40px;
-                color: var(--noxss-text-secondary);
-                border: 2px dashed var(--noxss-border-color);
-                border-radius: var(--noxss-border-radius-base);
-            }
-            .noxss-check > .noxss-check-control + span {
-                margin-left: 0.5rem;
-            }
-            #available-placeholders code {
-                cursor: pointer;
-                user-select: all;
-            }
-            /* --- Estilos para a área de preview do Markdown --- */
-            #markdown-preview-content ul {
-                list-style: none;
-                padding-left: 0;
-            }
-            #markdown-preview-content li {
-                background-color: var(--noxss-bg-elements);
-                padding: 0.75rem 1rem;
-                border-radius: var(--noxss-border-radius-base);
-                margin-bottom: 0.5rem;
-                border: 1px solid var(--noxss-border-color);
-                word-wrap: break-word; /* Garante que os links não quebrem o layout */
-            }
-            #markdown-preview-content a {
-                margin-left: 0.5rem;
-            }
-        </style>
-    </head>
-    <body data-noxss-layout="app">
-        <div class="noxss-layout">
-            <!-- 1. BARRA DE NAVEGAÇÃO SUPERIOR -->
-            <nav class="noxss-navbar">
-                <a class="noxss-navbar__brand" href="#"><i data-feather="users" class="noxss-icon"></i> <span>Gerador de Contatos</span></a>
-            </nav>
-
-            <!-- 2. CONTEÚDO PRINCIPAL COM ABAS -->
-            <main class="noxss-layout__content">
-                <div class="noxss-tabs" data-default-tab="generator">
-                    <!-- Abas para Desktop -->
-                    <div class="noxss-tabs__header d-none d-md-flex">
-                        <button class="noxss-tabs__header-button" data-tab-id="generator"><i class="noxss-icon" data-feather="edit"></i> Gerador</button>
-                        <button class="noxss-tabs__header-button" data-tab-id="customization"><i class="noxss-icon" data-feather="message-square"></i> Personalizar</button>
-                        <button class="noxss-tabs__header-button" data-tab-id="preview"><i class="noxss-icon" data-feather="eye"></i> Preview</button>
-                        <button class="noxss-tabs__header-button" data-tab-id="about"><i class="noxss-icon" data-feather="info"></i> Sobre</button>
-                    </div>
-
-                    <!-- Painéis de Conteúdo -->
-                    <div class="noxss-tabs__content-area">
-                        <!-- Painel: Gerador -->
-                        <div class="noxss-tabs__panel" id="panel-generator">
-                            <div class="content-panel">
-                                <div class="noxss-form-group">
-                                    <label for="jsonFileInput" class="noxss-label">1. Carregar arquivo de alunos (.json)</label>
-                                    <input type="file" id="jsonFileInput" class="noxss-input" accept=".json">
-                                </div>
-                                <hr>
-                                <div class="noxss-form-group">
-                                    <label class="noxss-label">2. Selecione os alunos para gerar a lista:</label>
-                                    <div id="student-selection-area">
-                                        <div id="placeholder">Aguardando arquivo...</div>
-                                    </div>
-                                    <div id="select-all-container" style="display: none; margin-top: 1rem;">
-                                        <label class="noxss-check">
-                                            <input type="checkbox" id="select-all-checkbox" />
-                                            <span class="noxss-check-control"></span>
-                                            <span>Selecionar / Desmarcar Todos</span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <hr>
-                                <button id="generate-button" class="noxss-btn noxss-btn--primary" disabled>
-                                    <i data-feather="arrow-right-circle" class="noxss-icon"></i>
-                                    <span>3. Gerar Relação e Preview</span>
-                                </button>
-                                <div id="output-area" style="display: none; margin-top: 2rem;">
-                                    <div class="noxss-form-group">
-                                        <label for="markdown-output" class="noxss-label">4. Código Markdown Gerado:</label>
-                                        <textarea id="markdown-output" class="noxss-textarea" readonly style="height: 300px; font-family: var(--noxss-font-family-monospace); font-size: 0.9em;"></textarea>
-                                    </div>
-                                    <button id="copy-button" class="noxss-btn noxss-btn--success">
-                                        <i data-feather="copy" class="noxss-icon"></i>
-                                        <span>Copiar Código</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Painel: Personalização da Mensagem -->
-                        <div class="noxss-tabs__panel" id="panel-customization">
-                            <div class="content-panel">
-                                <h2>Personalizar Mensagem</h2>
-                                <p class="text-secondary">Edite o texto abaixo para alterar a mensagem enviada. Suas alterações são salvas automaticamente.</p>
-                                <div class="noxss-form-group">
-                                    <label for="message-template-input" class="noxss-label">Template da Mensagem</label>
-                                    <textarea id="message-template-input" class="noxss-textarea" style="height: 250px;"></textarea>
-                                </div>
-                                <div class="noxss-form-group">
-                                    <label class="noxss-label">Placeholders disponíveis:</label>
-                                    <div id="available-placeholders">
-                                        <small class="text-secondary">Carregue um arquivo JSON para ver os placeholders.</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Painel: Preview do Markdown -->
-                        <div class="noxss-tabs__panel" id="panel-preview">
-                            <div class="content-panel">
-                                <h2><i data-feather="eye" class="noxss-icon"></i> Pré-visualização</h2>
-                                <div id="markdown-preview-content">
-                                    <p class="text-secondary" style="text-align: center; padding: 2rem;">
-                                        Gere uma relação na aba "Gerador" para visualizar o resultado aqui.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Painel: Sobre -->
-                        <div class="noxss-tabs__panel" id="panel-about">
-                            <div class="content-panel">
-                                <h2>Sobre o Gerador de Contatos</h2>
-                                <p class="text-secondary">Esta aplicação foi construída utilizando a biblioteca <strong>Noxss</strong> para criar uma interface moderna e funcional.</p>
-                                <ul>
-                                    <li><strong>Carregamento de Dados:</strong> Permite importar uma lista de alunos a partir de um arquivo JSON local.</li>
-                                    <li><strong>Seleção Persistente:</strong> Suas seleções de alunos são salvas no navegador.</li>
-                                    <li><strong>Geração Automatizada:</strong> Cria uma lista formatada com links diretos para o WhatsApp, usando uma mensagem que você pode personalizar.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
+          <!-- Painéis de Conteúdo -->
+          <div class="noxss-tabs__content-area">
+            <!-- Painel: Gerador -->
+            <div class="noxss-tabs__panel" id="panel-generator">
+              <div class="content-panel">
+                <div class="noxss-form-group">
+                  <label for="jsonFileInput" class="noxss-label">1. Carregar arquivo de alunos (.json)</label>
+                  <input type="file" id="jsonFileInput" class="noxss-input" accept=".json" />
                 </div>
-            </main>
+                <hr />
+                <div class="noxss-form-group">
+                  <label class="noxss-label">2. Selecione os alunos para gerar a lista:</label>
+                  <div id="student-selection-area">
+                    <div id="placeholder">Aguardando arquivo...</div>
+                  </div>
+                  <div id="select-all-container" style="display: none; margin-top: 1rem">
+                    <label class="noxss-check">
+                      <input type="checkbox" id="select-all-checkbox" />
+                      <span class="noxss-check-control"></span>
+                      <span>Selecionar / Desmarcar Todos</span>
+                    </label>
+                  </div>
+                </div>
+                <hr />
+                <button id="generate-button" class="noxss-btn noxss-btn--primary" disabled>
+                  <i data-feather="arrow-right-circle" class="noxss-icon"></i>
+                  <span>3. Gerar Relação e Preview</span>
+                </button>
+                <div id="output-area" style="display: none; margin-top: 2rem">
+                  <div class="noxss-form-group">
+                    <label for="markdown-output" class="noxss-label">4. Código Markdown Gerado:</label>
+                    <textarea id="markdown-output" class="noxss-textarea" readonly style="height: 300px; font-family: var(--noxss-font-family-monospace); font-size: 0.9em"></textarea>
+                  </div>
+                  <button id="copy-button" class="noxss-btn noxss-btn--success">
+                    <i data-feather="copy" class="noxss-icon"></i>
+                    <span>Copiar Código</span>
+                  </button>
+                </div>
+              </div>
+            </div>
 
-            <!-- 3. BARRA DE NAVEGAÇÃO INFERIOR (MOBILE) -->
-            <nav class="noxss-navbar noxss-navbar--bottom noxss-active-bg-button d-md-none">
-                <button class="noxss-tabs__nav-button" data-tab-id="generator" aria-label="Gerador"><i class="noxss-icon" data-feather="edit"></i></button>
-                <button class="noxss-tabs__nav-button" data-tab-id="customization" aria-label="Personalizar"><i class="noxss-icon" data-feather="message-square"></i></button>
-                <button class="noxss-tabs__nav-button" data-tab-id="preview" aria-label="Preview"><i class="noxss-icon" data-feather="eye"></i></button>
-                <button class="noxss-tabs__nav-button" data-tab-id="about" aria-label="Sobre"><i class="noxss-icon" data-feather="info"></i></button>
-            </nav>
+            <!-- Painel: Personalização da Mensagem -->
+            <div class="noxss-tabs__panel" id="panel-customization">
+              <div class="content-panel">
+                <h2>Personalizar Mensagem</h2>
+                <p class="text-secondary">Edite o texto abaixo para alterar a mensagem enviada. Suas alterações são salvas automaticamente.</p>
+                <div class="noxss-form-group">
+                  <label for="message-template-input" class="noxss-label">Template da Mensagem</label>
+                  <textarea id="message-template-input" class="noxss-textarea" style="height: 250px"></textarea>
+                </div>
+                <div class="noxss-form-group">
+                  <label class="noxss-label">Placeholders disponíveis:</label>
+                  <div id="available-placeholders">
+                    <small class="text-secondary">Carregue um arquivo JSON para ver os placeholders.</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Painel: Preview do Markdown -->
+            <div class="noxss-tabs__panel" id="panel-preview">
+              <div class="content-panel">
+                <h2><i data-feather="eye" class="noxss-icon"></i> Pré-visualização</h2>
+                <div id="markdown-preview-content">
+                  <p class="text-secondary" style="text-align: center; padding: 2rem">Gere uma relação na aba "Gerador" para visualizar o resultado aqui.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Painel: Sobre -->
+            <div class="noxss-tabs__panel" id="panel-about">
+              <div class="content-panel">
+                <h2>Sobre o Gerador de Contatos</h2>
+                <p class="text-secondary">
+                  Esta aplicação foi construída utilizando a biblioteca
+                  <strong>Noxss</strong> para criar uma interface moderna e funcional.
+                </p>
+                <ul>
+                  <li><strong>Carregamento de Dados:</strong> Permite importar uma lista de alunos a partir de um arquivo JSON local.</li>
+                  <li><strong>Seleção Persistente:</strong> Suas seleções de alunos são salvas no navegador.</li>
+                  <li><strong>Geração Automatizada:</strong> Cria uma lista formatada com links diretos para o WhatsApp, usando uma mensagem que você pode personalizar.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
+      </main>
 
-        <script src="https://cdn.jsdelivr.net/gh/suntzar/noxss-base@main/noxss/dist/noxss.js"></script>
-        <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                setTimeout(() => { if (window.feather) feather.replace() }, 100);
+      <!-- 3. BARRA DE NAVEGAÇÃO INFERIOR (MOBILE) -->
+      <nav class="noxss-navbar noxss-navbar--bottom noxss-active-bg-button d-md-none">
+        <button class="noxss-tabs__nav-button" data-tab-id="generator" aria-label="Gerador">
+          <i class="noxss-icon" data-feather="edit"></i>
+        </button>
+        <button class="noxss-tabs__nav-button" data-tab-id="customization" aria-label="Personalizar">
+          <i class="noxss-icon" data-feather="message-square"></i>
+        </button>
+        <button class="noxss-tabs__nav-button" data-tab-id="preview" aria-label="Preview">
+          <i class="noxss-icon" data-feather="eye"></i>
+        </button>
+        <button class="noxss-tabs__nav-button" data-tab-id="about" aria-label="Sobre">
+          <i class="noxss-icon" data-feather="info"></i>
+        </button>
+      </nav>
+    </div>
 
-                let allStudents = [];
-                const SELECTION_STORAGE_KEY = 'studentSelectionState';
-                const MESSAGE_TEMPLATE_KEY = 'whatsappMessageTemplate';
+    <script src="https://cdn.jsdelivr.net/gh/suntzar/noxss-base@main/noxss/dist/noxss.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        setTimeout(() => {
+          if (window.feather) feather.replace();
+        }, 100);
 
-                const htmlElement = document.documentElement;
-                const fileInput = document.getElementById('jsonFileInput');
-                const generateButton = document.getElementById('generate-button');
-                const selectionArea = document.getElementById('student-selection-area');
-                const outputArea = document.getElementById('output-area');
-                const markdownOutput = document.getElementById('markdown-output');
-                const copyButton = document.getElementById('copy-button');
-                const selectAllContainer = document.getElementById('select-all-container');
-                const selectAllCheckbox = document.getElementById('select-all-checkbox');
-                const messageTemplateInput = document.getElementById('message-template-input');
-                const placeholdersContainer = document.getElementById('available-placeholders');
-                const previewContent = document.getElementById('markdown-preview-content');
-                
-                loadMessageTemplate();
+        let allStudents = [];
+        const SELECTION_STORAGE_KEY = "studentSelectionState";
+        const MESSAGE_TEMPLATE_KEY = "whatsappMessageTemplate";
 
-                fileInput.addEventListener('change', handleFileLoad);
-                generateButton.addEventListener('click', generateMarkdown);
-                copyButton.addEventListener('click', copyToClipboard);
-                selectAllCheckbox.addEventListener('click', toggleSelectAll);
-                messageTemplateInput.addEventListener('input', saveMessageTemplate);
+        const htmlElement = document.documentElement;
+        const fileInput = document.getElementById("jsonFileInput");
+        const generateButton = document.getElementById("generate-button");
+        const selectionArea = document.getElementById("student-selection-area");
+        const outputArea = document.getElementById("output-area");
+        const markdownOutput = document.getElementById("markdown-output");
+        const copyButton = document.getElementById("copy-button");
+        const selectAllContainer = document.getElementById("select-all-container");
+        const selectAllCheckbox = document.getElementById("select-all-checkbox");
+        const messageTemplateInput = document.getElementById("message-template-input");
+        const placeholdersContainer = document.getElementById("available-placeholders");
+        const previewContent = document.getElementById("markdown-preview-content");
 
-                const tabSystem = document.querySelector('.noxss-tabs');
-                if (tabSystem) {
-                    tabSystem.addEventListener('noxss:tab:change', (event) => {
-                        if (event.detail.activeTabId === 'preview') {
-                            renderMarkdownPreview();
-                        }
-                    });
-                }
+        loadMessageTemplate();
 
-                function handleFileLoad(event) {
-                    const file = event.target.files[0];
-                    if (!file) return;
+        fileInput.addEventListener("change", handleFileLoad);
+        generateButton.addEventListener("click", generateMarkdown);
+        copyButton.addEventListener("click", copyToClipboard);
+        selectAllCheckbox.addEventListener("click", toggleSelectAll);
+        messageTemplateInput.addEventListener("input", saveMessageTemplate);
 
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        try {
-                            const students = JSON.parse(e.target.result);
-                            allStudents = students.filter(s => s.status !== 'Inativo' && s.status !== 'Transferido');
-                            populateStudentList();
-                            updateAvailablePlaceholders();
-                            generateButton.disabled = false;
-                            selectAllContainer.style.display = 'block';
-                        } catch (error) {
-                            selectionArea.innerHTML = `<div id="placeholder" style="color: var(--noxss-color-danger); border-color: var(--noxss-color-danger);">Erro ao processar o arquivo. Verifique o formato JSON.</div>`;
-                            console.error("Erro no JSON:", error);
-                            generateButton.disabled = true;
-                            selectAllContainer.style.display = 'none';
-                        }
-                    };
-                    reader.readAsText(file);
-                }
+        const tabSystem = document.querySelector(".noxss-tabs");
+        if (tabSystem) {
+          tabSystem.addEventListener("noxss:tab:change", (event) => {
+            if (event.detail.activeTabId === "preview") {
+              renderMarkdownPreview();
+            }
+          });
+        }
 
-                function populateStudentList() {
-                    selectionArea.innerHTML = '';
-                    if (allStudents.length === 0) {
-                        selectionArea.innerHTML = `<div id="placeholder">Nenhum aluno ativo encontrado no arquivo.</div>`;
-                        return;
-                    }
-                    
-                    const grouped = allStudents.reduce((acc, student) => {
-                        const key = `${student.turma || 'Sem Turma'} - ${student.turno || 'Sem Turno'}`;
-                        if (!acc[key]) acc[key] = [];
-                        acc[key].push({ ...student, uniqueId: student.nome });
-                        return acc;
-                    }, {});
+        function handleFileLoad(event) {
+          const file = event.target.files[0];
+          if (!file) return;
 
-                    const sortedGroupKeys = Object.keys(grouped).sort();
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            try {
+              const students = JSON.parse(e.target.result);
+              allStudents = students.filter((s) => s.status !== "Inativo" && s.status !== "Transferido");
+              populateStudentList();
+              updateAvailablePlaceholders();
+              generateButton.disabled = false;
+              selectAllContainer.style.display = "block";
+            } catch (error) {
+              selectionArea.innerHTML = `<div id="placeholder" style="color: var(--noxss-color-danger); border-color: var(--noxss-color-danger);">Erro ao processar o arquivo. Verifique o formato JSON.</div>`;
+              console.error("Erro no JSON:", error);
+              generateButton.disabled = true;
+              selectAllContainer.style.display = "none";
+            }
+          };
+          reader.readAsText(file);
+        }
 
-                    sortedGroupKeys.forEach(groupKey => {
-                        const groupDiv = document.createElement('div');
-                        groupDiv.className = 'turma-group';
-                        const title = document.createElement('h3');
-                        title.className = 'turma-title';
-                        title.textContent = groupKey;
-                        groupDiv.appendChild(title);
+        function populateStudentList() {
+          selectionArea.innerHTML = "";
+          if (allStudents.length === 0) {
+            selectionArea.innerHTML = `<div id="placeholder">Nenhum aluno ativo encontrado no arquivo.</div>`;
+            return;
+          }
 
-                        grouped[groupKey]
-                            .sort((a, b) => (a.nome || '').localeCompare(b.nome || ''))
-                            .forEach(student => {
-                                const itemLabel = document.createElement('label');
-                                itemLabel.className = 'noxss-check';
-                                const checkbox = document.createElement('input');
-                                checkbox.type = 'checkbox';
-                                checkbox.className = 'student-checkbox';
-                                checkbox.id = `student-${student.uniqueId}`;
-                                checkbox.value = student.uniqueId;
-                                checkbox.addEventListener('change', saveSelectionState);
-                                const checkControl = document.createElement('span');
-                                checkControl.className = 'noxss-check-control';
-                                const labelText = document.createElement('span');
-                                labelText.textContent = student.nome;
-                                
-                                itemLabel.appendChild(checkbox);
-                                itemLabel.appendChild(checkControl);
-                                itemLabel.appendChild(labelText);
-                                groupDiv.appendChild(itemLabel);
-                            });
-                        selectionArea.appendChild(groupDiv);
-                    });
-                    
-                    loadSelectionState();
-                }
-                
-                function updateAvailablePlaceholders() {
-                    placeholdersContainer.innerHTML = '';
-                    if (allStudents.length === 0) {
-                        placeholdersContainer.innerHTML = '<small class="text-secondary">Carregue um arquivo para ver os placeholders.</small>';
-                        return;
-                    }
-                    const firstStudent = allStudents[0];
-                    const keys = Object.keys(firstStudent);
-                    
-                    keys.forEach(key => {
-                        const code = document.createElement('code');
-                        code.textContent = `<<${key}>>`;
-                        placeholdersContainer.appendChild(code);
-                        placeholdersContainer.appendChild(document.createTextNode(' '));
-                    });
-                }
-                
-                function saveSelectionState() {
-                    const checkedCheckboxes = document.querySelectorAll('.student-checkbox:checked');
-                    const selectedIds = Array.from(checkedCheckboxes).map(cb => cb.value);
-                    localStorage.setItem(SELECTION_STORAGE_KEY, JSON.stringify(selectedIds));
-                }
+          const grouped = allStudents.reduce((acc, student) => {
+            const key = `${student.turma || "Sem Turma"} - ${student.turno || "Sem Turno"}`;
+            if (!acc[key]) acc[key] = [];
+            acc[key].push({ ...student, uniqueId: student.nome });
+            return acc;
+          }, {});
 
-                function loadSelectionState() {
-                    const savedState = localStorage.getItem(SELECTION_STORAGE_KEY);
-                    if (!savedState) return;
-                    try {
-                        const selectedIds = JSON.parse(savedState);
-                        const selectedSet = new Set(selectedIds);
-                        document.querySelectorAll('.student-checkbox').forEach(checkbox => {
-                            checkbox.checked = selectedSet.has(checkbox.value);
-                        });
-                    } catch(e) { console.error("Erro ao carregar estado salvo:", e); }
-                }
+          const sortedGroupKeys = Object.keys(grouped).sort();
 
-                function saveMessageTemplate() {
-                    localStorage.setItem(MESSAGE_TEMPLATE_KEY, messageTemplateInput.value);
-                }
+          sortedGroupKeys.forEach((groupKey) => {
+            const groupDiv = document.createElement("div");
+            groupDiv.className = "turma-group";
+            const title = document.createElement("h3");
+            title.className = "turma-title";
+            title.textContent = groupKey;
+            groupDiv.appendChild(title);
 
-                function loadMessageTemplate() {
-                    const savedTemplate = localStorage.getItem(MESSAGE_TEMPLATE_KEY);
-                    const defaultTemplate = "Boa tarde!\n\nSou o ADM Luis Fernando, da Escola Ana Maria Cordeiro de Sousa.\nA pedido da SEMED, estamos realizando a coleta da pontuação do calçado das crianças.\n\nSolicitamos, por gentileza, a pontuação do calçado de <<nome>>.\n\nDesde já, agradecemos a colaboração.";
-                    messageTemplateInput.value = savedTemplate || defaultTemplate;
-                }
-                
-                function cleanPhoneNumber(phone) {
-                    const defaultDDD = '98'; 
-                    let digits = String(phone).replace(/\D/g, '');
-                    if (digits.length === 9) digits = defaultDDD + digits;
-                    return (digits.length >= 10 && digits.length <= 11) ? '55' + digits : null;
-                }
+            grouped[groupKey]
+              .sort((a, b) => (a.nome || "").localeCompare(b.nome || ""))
+              .forEach((student) => {
+                const itemLabel = document.createElement("label");
+                itemLabel.className = "noxss-check";
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.className = "student-checkbox";
+                checkbox.id = `student-${student.uniqueId}`;
+                checkbox.value = student.uniqueId;
+                checkbox.addEventListener("change", saveSelectionState);
+                const checkControl = document.createElement("span");
+                checkControl.className = "noxss-check-control";
+                const labelText = document.createElement("span");
+                labelText.textContent = student.nome;
 
-                function generateMarkdown() {
-                    const selectedCheckboxes = document.querySelectorAll('.student-checkbox:checked');
-                    if (selectedCheckboxes.length === 0) {
-                        if(window.Noxss) Noxss.Toasts.show({ message: 'Selecione pelo menos um aluno.', status: 'warning' });
-                        return;
-                    }
+                itemLabel.appendChild(checkbox);
+                itemLabel.appendChild(checkControl);
+                itemLabel.appendChild(labelText);
+                groupDiv.appendChild(itemLabel);
+              });
+            selectionArea.appendChild(groupDiv);
+          });
 
-                    const markdownLines = [];
-                    const messageTemplate = messageTemplateInput.value;
+          loadSelectionState();
+        }
 
-                    selectedCheckboxes.forEach(checkbox => {
-                        const studentId = checkbox.value;
-                        const student = allStudents.find(s => s.nome === studentId);
-                        if (!student) return;
+        function updateAvailablePlaceholders() {
+          placeholdersContainer.innerHTML = "";
+          if (allStudents.length === 0) {
+            placeholdersContainer.innerHTML = '<small class="text-secondary">Carregue um arquivo para ver os placeholders.</small>';
+            return;
+          }
+          const firstStudent = allStudents[0];
+          const keys = Object.keys(firstStudent);
 
-                        const personalizedMessage = messageTemplate.replace(/<<(\w+)>>/g, (match, key) => {
-                            return student[key] !== undefined ? student[key] : match;
-                        });
-                        
-                        const contacts = [];
-                        if (student.telefone && Array.isArray(student.telefone)) {
-                            student.telefone.forEach(phone => {
-                                const cleanPhone = cleanPhoneNumber(phone);
-                                if (cleanPhone) {
-                                    const messageEncoded = encodeURIComponent(personalizedMessage);
-                                    const link = `https://wa.me/${cleanPhone}?text=${messageEncoded}`;
-                                    contacts.push(`[${String(phone).trim()}](${link})`);
-                                }
-                            });
-                        }
+          keys.forEach((key) => {
+            const code = document.createElement("code");
+            code.textContent = `<<${key}>>`;
+            placeholdersContainer.appendChild(code);
+            placeholdersContainer.appendChild(document.createTextNode(" "));
+          });
+        }
 
-                        if (contacts.length > 0) {
-                            markdownLines.push(`- **${student.nome}:** ${contacts.join(' ')}`);
-                        } else {
-                            markdownLines.push(`- **${student.nome}:** (Sem número de contato válido)`);
-                        }
-                    });
+        function saveSelectionState() {
+          const checkedCheckboxes = document.querySelectorAll(".student-checkbox:checked");
+          const selectedIds = Array.from(checkedCheckboxes).map((cb) => cb.value);
+          localStorage.setItem(SELECTION_STORAGE_KEY, JSON.stringify(selectedIds));
+        }
 
-                    markdownOutput.value = markdownLines.join('\n');
-                    outputArea.style.display = 'block';
-                    renderMarkdownPreview(); // Renderiza o preview assim que gera o markdown
-                    if(window.Noxss) Noxss.Toasts.show({ message: 'Relação gerada! Confira a aba de Preview.', status: 'info' });
-                }
-
-                function renderMarkdownPreview() {
-                    const markdownText = markdownOutput.value;
-                    if (!markdownText) {
-                        previewContent.innerHTML = `<p class="text-secondary" style="text-align: center; padding: 2rem;">Gere uma relação na aba "Gerador" para visualizar o resultado aqui.</p>`;
-                        return;
-                    }
-                    previewContent.innerHTML = marked.parse(markdownText);
-                }
-
-                function copyToClipboard() {
-                    if(!markdownOutput.value) return;
-                    navigator.clipboard.writeText(markdownOutput.value).then(() => {
-                        if(window.Noxss) Noxss.Toasts.show({ message: 'Código Markdown copiado!', status: 'success' });
-                    }).catch(err => {
-                        console.error('Falha ao copiar texto: ', err);
-                        if(window.Noxss) Noxss.Toasts.show({ message: 'Falha ao copiar o código.', status: 'danger' });
-                    });
-                }
-
-                function toggleSelectAll() {
-                    document.querySelectorAll('.student-checkbox').forEach(checkbox => {
-                        checkbox.checked = selectAllCheckbox.checked;
-                    });
-                    saveSelectionState();
-                }
-
-                htmlElement.setAttribute("data-noxss-theme-gen", "dark");
-                htmlElement.setAttribute("data-noxss-palette-gen", "#e0c670");
+        function loadSelectionState() {
+          const savedState = localStorage.getItem(SELECTION_STORAGE_KEY);
+          if (!savedState) return;
+          try {
+            const selectedIds = JSON.parse(savedState);
+            const selectedSet = new Set(selectedIds);
+            document.querySelectorAll(".student-checkbox").forEach((checkbox) => {
+              checkbox.checked = selectedSet.has(checkbox.value);
             });
-        </script>
-    </body>
+          } catch (e) {
+            console.error("Erro ao carregar estado salvo:", e);
+          }
+        }
+
+        function saveMessageTemplate() {
+          localStorage.setItem(MESSAGE_TEMPLATE_KEY, messageTemplateInput.value);
+        }
+
+        function loadMessageTemplate() {
+          const savedTemplate = localStorage.getItem(MESSAGE_TEMPLATE_KEY);
+          const defaultTemplate = "Boa tarde!\n\nSou o ADM Luis Fernando, da Escola Ana Maria Cordeiro de Sousa.\nA pedido da SEMED, estamos realizando a coleta da pontuação do calçado das crianças.\n\nSolicitamos, por gentileza, a pontuação do calçado de <<nome>>.\n\nDesde já, agradecemos a colaboração.";
+          messageTemplateInput.value = savedTemplate || defaultTemplate;
+        }
+
+        function cleanPhoneNumber(phone) {
+          const defaultDDD = "98";
+          let digits = String(phone).replace(/\D/g, "");
+          if (digits.length === 9) digits = defaultDDD + digits;
+          return digits.length >= 10 && digits.length <= 11 ? "55" + digits : null;
+        }
+
+        function generateMarkdown() {
+          const selectedCheckboxes = document.querySelectorAll(".student-checkbox:checked");
+          if (selectedCheckboxes.length === 0) {
+            if (window.Noxss)
+              Noxss.Toasts.show({
+                message: "Selecione pelo menos um aluno.",
+                status: "warning",
+              });
+            return;
+          }
+
+          const markdownLines = [];
+          const messageTemplate = messageTemplateInput.value;
+
+          selectedCheckboxes.forEach((checkbox) => {
+            const studentId = checkbox.value;
+            const student = allStudents.find((s) => s.nome === studentId);
+            if (!student) return;
+
+            const personalizedMessage = messageTemplate.replace(/<<(\w+)>>/g, (match, key) => {
+              return student[key] !== undefined ? student[key] : match;
+            });
+
+            const contacts = [];
+            if (student.telefone && Array.isArray(student.telefone)) {
+              student.telefone.forEach((phone) => {
+                const cleanPhone = cleanPhoneNumber(phone);
+                if (cleanPhone) {
+                  const messageEncoded = encodeURIComponent(personalizedMessage);
+                  const link = `https://wa.me/${cleanPhone}?text=${messageEncoded}`;
+                  contacts.push(`[${String(phone).trim()}](${link})`);
+                }
+              });
+            }
+
+            if (contacts.length > 0) {
+              markdownLines.push(`- **${student.nome}:** ${contacts.join(" ")}`);
+            } else {
+              markdownLines.push(`- **${student.nome}:** (Sem número de contato válido)`);
+            }
+          });
+
+          markdownOutput.value = markdownLines.join("\n");
+          outputArea.style.display = "block";
+          renderMarkdownPreview(); // Renderiza o preview assim que gera o markdown
+          if (window.Noxss)
+            Noxss.Toasts.show({
+              message: "Relação gerada! Confira a aba de Preview.",
+              status: "info",
+            });
+        }
+
+        function renderMarkdownPreview() {
+          const markdownText = markdownOutput.value;
+          if (!markdownText) {
+            previewContent.innerHTML = `<p class="text-secondary" style="text-align: center; padding: 2rem;">Gere uma relação na aba "Gerador" para visualizar o resultado aqui.</p>`;
+            return;
+          }
+          previewContent.innerHTML = marked.parse(markdownText);
+        }
+
+        function copyToClipboard() {
+          if (!markdownOutput.value) return;
+          navigator.clipboard
+            .writeText(markdownOutput.value)
+            .then(() => {
+              if (window.Noxss)
+                Noxss.Toasts.show({
+                  message: "Código Markdown copiado!",
+                  status: "success",
+                });
+            })
+            .catch((err) => {
+              console.error("Falha ao copiar texto: ", err);
+              if (window.Noxss)
+                Noxss.Toasts.show({
+                  message: "Falha ao copiar o código.",
+                  status: "danger",
+                });
+            });
+        }
+
+        function toggleSelectAll() {
+          document.querySelectorAll(".student-checkbox").forEach((checkbox) => {
+            checkbox.checked = selectAllCheckbox.checked;
+          });
+          saveSelectionState();
+        }
+
+        htmlElement.setAttribute("data-noxss-theme-gen", "dark");
+        htmlElement.setAttribute("data-noxss-palette-gen", "#e0c670");
+      });
+    </script>
+  </body>
 </html>
